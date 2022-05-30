@@ -1,0 +1,15 @@
+__pycache__/
+baserom
+baserom.bin
+build/
+check/
+expected/
+compilers/
+.vscode/
+*.o
+*.suo
+*.dump
+tmp/
+/asm/full/
+src/m2ctx.py
+ctx.c
