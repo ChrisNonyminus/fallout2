@@ -138,6 +138,8 @@ for sym in symtab.nlists:
 
 
 def is_label_candidate(addr):
+    if addr % 4 != 0:
+        return False
     for i in range(0, len(textOffsets)):
         if addr >= textAddresses[i] and addr < textAddresses[i] + textSizes[i] and (addr & 3) == 0:
             return True
@@ -365,7 +367,7 @@ def get_label_callback(address, offset, insn, bytes):
                 if addr_to_off(off) != None:
                     if not addr_is_in_text(off):
                         while off != 0 and addr_to_off(off) != None:
-                            if addr_is_in_text(off):
+                            if addr_is_in_text(off) and off % 4 == 0:
                                 print("# DEBUG: add label sub_%08X" % off)
                                 add_label(off, 'sub_%08X' % off)
                                 off = 0
@@ -380,7 +382,7 @@ def get_label_callback(address, offset, insn, bytes):
                 if addr_to_off(off) != None:
                     if not addr_is_in_text(off):
                         while off != 0 and addr_to_off(off) != None:
-                            if addr_is_in_text(off):
+                            if addr_is_in_text(off) and off % 4 == 0:
                                 print("# DEBUG: add label sub_%08X" % off)
                                 add_label(off, 'sub_%08X' % off)
                                 off = 0
@@ -421,10 +423,10 @@ def get_label_callback(address, offset, insn, bytes):
             if addr_to_off(value) != None:
                 add_label(value)
                 off = read_u32(addr_to_off(value))
-                if addr_to_off(off) != None:
+                if off % 4 == 0 and addr_to_off(off) != None:
                     if not addr_is_in_text(off):
                         add_label(off)
-                        while addr_to_off(off) != None:
+                        while off % 4 == 0 and addr_to_off(off) != None:
                             if addr_is_in_text(off):
                                 print("# DEBUG: add label 0x%08X" % off)
                                 add_label(off, 'sub_%08X' % off)
@@ -438,16 +440,19 @@ def get_label_callback(address, offset, insn, bytes):
 for i in range(0, len(textAddresses)):
     if textSizes[i] != 0:
         disasm_iter(textOffsets[i], textAddresses[i], textSizes[i], get_label_callback)
-
+def align_length(address, orig_length, alignment):
+    while (address + orig_length) % alignment != 0:
+        orig_length += 1
+    return orig_length
 for d in range(len(dataAddresses)):
     for i in range(dataAddresses[d], dataAddresses[d] + dataSizes[d]):
         if i in labels:
             print("# DEBUG: checking for pointers in data at 0x%08X, until the next label" % i)
             i += 4
-            while not i in labels and i < dataAddresses[d] + dataSizes[d]:
+            while not align_length(0, i, 4) in labels and i < dataAddresses[d] + dataSizes[d]:
                 if addr_to_off(i) != None:
                     off = read_u32(addr_to_off(i))
-                    if is_label_candidate(off):
+                    if is_label_candidate(off) and off % 4 == 0:
                         print("# DEBUG: add label 0x%08X" % off)
                         add_label(off)
                         add_label(i)

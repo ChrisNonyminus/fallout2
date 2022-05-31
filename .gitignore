@@ -1,6 +1,5 @@
 __pycache__/
 baserom
-baserom.bin
 build/
 check/
 expected/
@@ -10,6 +9,5 @@ compilers/
 *.suo
 *.dump
 tmp/
-/asm/full/
 src/m2ctx.py
 ctx.c

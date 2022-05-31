@@ -11,7 +11,7 @@ labelNames = {}
 
 print("# Scanning for labels first...")
 
-file = open("main.s", "rt")
+file = open("asm/main.s", "rt")
 label = ''
 address = 0
 for line in file.readlines():
