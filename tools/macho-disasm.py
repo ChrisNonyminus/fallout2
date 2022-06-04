@@ -335,7 +335,7 @@ def get_label_callback(address, offset, insn, bytes):
     if insn.id == PPC_INS_LIS:
         # Record instruction that loads into register with 'lis'
         lisInsns[insn.operands[0].reg] = insn
-    if insn.id == PPC_INS_ADDIS and get_last_mflr(insn.address, insn.operands[1].reg) != None:
+    elif insn.id == PPC_INS_ADDIS and get_last_mflr(insn.address, insn.operands[1].reg) != None:
         lisInsns[insn.operands[0].reg] = insn
     # Detect split load (low part)
     # this is either 'addi/ori rY, rX, lopart' or 'load/store rY, lopart(rX)'
